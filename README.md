@@ -14,11 +14,6 @@
 ### DNN based SE
 - There are mainly two groups of speech enhancement using DNN, i.e., masking-based models (TF-Masking) [2] and mapping-based models (Spectral-Mapping) [3]. TF-Masking models describe the time-freqeuncy relationships of clean speech to background interference, while Spectral-Mapping models correspond to the spectral representations of clean speech [2].
 
-| | |
-| :---: | :---: |
-|<img src = 'assets/DNN_tf_masking.png'> | <img src = 'assets/DNN_SM.JPG'> |
-
-
 ### Statistical model based SE
 - https://github.com/eesungkim/Speech_Enhancement_MMSE-STSA
 
