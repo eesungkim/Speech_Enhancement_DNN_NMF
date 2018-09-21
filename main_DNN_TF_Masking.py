@@ -112,34 +112,33 @@ def DNN_TF_Masking(args):
     output_path_estimated_noisy_test = os.path.join(PATH_ROOT, args.output_file)
     wav.write(output_path_estimated_noisy_test,sr,signal_reconstructed_clean)
 
-
     # Display signals, spectrograms
     show_signal(clean_test,noisy_test,signal_reconstructed_clean,sr)
     show_spectrogram(clean_test,noisy_test, signal_reconstructed_clean, sr, args.num_FFT,args.hop_size)
 
-    # =============================================================================
-    # PESQ
-    # =============================================================================
-    PATH_MATLAB='"C:/Program Files/MATLAB/R2014a/bin/matlab.exe"'
-
-    PATH_MATLAB1 = os.path.join(PATH_ROOT , 'PESQ_MATLAB/execute_pesq.m')
-    from pymatbridge import Matlab
-    mlab = Matlab()
-    mlab = Matlab(executable=PATH_MATLAB)
-    mlab.start()
-
-    #PATH_MATLAB1 = os.path.join(PATH_ROOT , "PESQ_MATLAB","execute_pesq.m")
-    result_PESQ = mlab.run_func(PATH_MATLAB1, {'arg1': sr})
-
-    noisy_original_PESQ = result_PESQ['result'][0][0]
-    enhanced_PESQ = result_PESQ['result'][1][0]
-
-    mlab.stop()
-
-    snr=args.input_noisy_test
-    name=snr[53:-9]
-    print("[%s]\n Original: %.2f\n TF-Masking\t: %.2f"%(name,noisy_original_PESQ,enhanced_PESQ))
-   
+    # # =============================================================================
+    # # PESQ
+    # # =============================================================================
+    # PATH_MATLAB='"C:/Program Files/MATLAB/R2014a/bin/matlab.exe"'
+    #
+    # PATH_MATLAB1 = os.path.join(PATH_ROOT , 'PESQ_MATLAB/execute_pesq.m')
+    # from pymatbridge import Matlab
+    # mlab = Matlab()
+    # mlab = Matlab(executable=PATH_MATLAB)
+    # mlab.start()
+    #
+    # #PATH_MATLAB1 = os.path.join(PATH_ROOT , "PESQ_MATLAB","execute_pesq.m")
+    # result_PESQ = mlab.run_func(PATH_MATLAB1, {'arg1': sr})
+    #
+    # noisy_original_PESQ = result_PESQ['result'][0][0]
+    # enhanced_PESQ = result_PESQ['result'][1][0]
+    #
+    # mlab.stop()
+    #
+    # snr=args.input_noisy_test
+    # name=snr[53:-9]
+    # print("[%s]\n Original: %.2f\n TF-Masking\t: %.2f"%(name,noisy_original_PESQ,enhanced_PESQ))
+    #
 def parse_args():
     parser = argparse.ArgumentParser(description='DNN-TF-Masking Speech Enhancement')
     parser.add_argument('--datasets_dir',       type=str, default='datasets/')

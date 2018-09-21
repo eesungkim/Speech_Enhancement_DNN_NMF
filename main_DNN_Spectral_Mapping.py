@@ -97,13 +97,11 @@ def DNN_Spectral_Mapping(args):
     # plot_model_history(model_info)
     print("Training complete.")
 
-
     # Enhancement stage
     #####################################################################################
     magnitude_estimated_clean = model.predict(X_test).T
     magnitude_estimated_clean = np.exp(np.sqrt(magnitude_estimated_clean))
     # magnitude_estimated_clean = magnitude_estimated_clean.astype('int16')
-
 
     # magnitude_estimated_clean=norm(magnitude_estimated_clean)
     #Reconstruction

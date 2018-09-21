@@ -118,28 +118,29 @@ def NMF(args):
     signal_reconstructed_clean =librosa.istft(stft_reconstructed_clean, hop_length=args.hop_size, window=args.window)
     signal_reconstructed_clean = signal_reconstructed_clean.astype('int16')
     wav.write(output_path_estimated_noisy_test,sr,signal_reconstructed_clean)
-    # =============================================================================
-    # PESQ
-    # =============================================================================
-    from pymatbridge import Matlab
-    mlab = Matlab()
-    mlab = Matlab(executable=PATH_MATLAB)
-    mlab.start()
-    #PATH_MATLAB1 = os.path.join(PATH_ROOT , "PESQ_MATLAB","execute_pesq.m")
-    result_PESQ = mlab.run_func(PATH_MATLAB1, {'arg1': sr})
-    noisy_original_PESQ = result_PESQ['result'][0][0]
-    enhanced_PESQ = result_PESQ['result'][1][0]
-    mlab.stop()
-    snr=args.input_noisy_test
-    name=snr[53:-9]
-    print("[%s]\n Original: %.2f\n NMF\t: %.2f"%(name,noisy_original_PESQ,enhanced_PESQ))
-
-    # print('Noisy STOI: %.6f' % calc_stoi(clean_test / norm(clean_test), noisy_test / norm(noisy_test), sr))
-    # print('NMF STOI: %.6f' % calc_stoi(clean_test / norm(clean_test), signal_reconstructed_clean / norm(signal_reconstructed_clean), sr))
-
     # Display signals, spectrograms
     show_signal(clean_test,noisy_test,signal_reconstructed_clean,sr)
     show_spectrogram(clean_test,noisy_test, signal_reconstructed_clean, sr, args.num_FFT,args.hop_size)
+
+    # # =============================================================================
+    # # PESQ
+    # # =============================================================================
+    # from pymatbridge import Matlab
+    # mlab = Matlab()
+    # mlab = Matlab(executable=PATH_MATLAB)
+    # mlab.start()
+    # #PATH_MATLAB1 = os.path.join(PATH_ROOT , "PESQ_MATLAB","execute_pesq.m")
+    # result_PESQ = mlab.run_func(PATH_MATLAB1, {'arg1': sr})
+    # noisy_original_PESQ = result_PESQ['result'][0][0]
+    # enhanced_PESQ = result_PESQ['result'][1][0]
+    # mlab.stop()
+    # snr=args.input_noisy_test
+    # name=snr[53:-9]
+    # print("[%s]\n Original: %.2f\n NMF\t: %.2f"%(name,noisy_original_PESQ,enhanced_PESQ))
+    #
+    # # print('Noisy STOI: %.6f' % calc_stoi(clean_test / norm(clean_test), noisy_test / norm(noisy_test), sr))
+    # # print('NMF STOI: %.6f' % calc_stoi(clean_test / norm(clean_test), signal_reconstructed_clean / norm(signal_reconstructed_clean), sr))
+    #
 
 
 

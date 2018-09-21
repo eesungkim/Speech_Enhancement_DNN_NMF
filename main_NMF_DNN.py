@@ -194,26 +194,22 @@ def NMF_DNN(args):
     # Display signals, spectrograms
     show_signal(clean_test,noisy_test,signal_reconstructed_clean,sr)
     show_spectrogram(clean_test,noisy_test, signal_reconstructed_clean, sr, args.frame_length,args.hop_size)
-    # =============================================================================
-    # PESQ
-    # =============================================================================
-    from pymatbridge import Matlab
-    mlab = Matlab()
-    mlab = Matlab(executable=PATH_MATLAB)
-    mlab.start()
-    #PATH_MATLAB1 = os.path.join(PATH_ROOT , "PESQ_MATLAB","execute_pesq.m")
-    result_PESQ = mlab.run_func(PATH_MATLAB1, {'arg1': sr})
-    noisy_original_PESQ = result_PESQ['result'][0][0]
-    enhanced_PESQ = result_PESQ['result'][1][0]
-    mlab.stop()
-    snr=args.input_noisy_test
-    name=snr[53:-9]
-    print("[%s]\n Original: %.2f\n NMF-DNN\t: %.2f"%(name,noisy_original_PESQ,enhanced_PESQ))
-
-
-    from line_notify import LineNotify
-    notify = LineNotify("yIuEACAwFk8CaORZRmBtDNdZhdOCRB7SnMO1qIRf810")
-    notify.send("[%s]\n Original: %.2f=\n NMF-DNN\t: %.2f"%(name,noisy_original_PESQ,enhanced_PESQ))
+    # # =============================================================================
+    # # PESQ
+    # # =============================================================================
+    # from pymatbridge import Matlab
+    # mlab = Matlab()
+    # mlab = Matlab(executable=PATH_MATLAB)
+    # mlab.start()
+    # #PATH_MATLAB1 = os.path.join(PATH_ROOT , "PESQ_MATLAB","execute_pesq.m")
+    # result_PESQ = mlab.run_func(PATH_MATLAB1, {'arg1': sr})
+    # noisy_original_PESQ = result_PESQ['result'][0][0]
+    # enhanced_PESQ = result_PESQ['result'][1][0]
+    # mlab.stop()
+    # snr=args.input_noisy_test
+    # name=snr[53:-9]
+    # print("[%s]\n Original: %.2f\n NMF-DNN\t: %.2f"%(name,noisy_original_PESQ,enhanced_PESQ))
+    #
 
 
 def parse_args():
