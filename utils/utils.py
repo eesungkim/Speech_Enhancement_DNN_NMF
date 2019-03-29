@@ -8,6 +8,7 @@ import librosa
 import librosa.display
 import matplotlib.pyplot as plt
 import tensorflow as tf
+import scipy.io.wavfile as wav
 
 def cost_snmf(V, W, H, beta=2,mu=0.1):
     A=tf.matmul(W,H)
@@ -231,8 +232,6 @@ def divide_magphase(D, power=1):
     and phase (P) components, so that `D = S * P`."""
 
     mag = np.abs(D)**power
-    # mag **= 2
-    # mag = np.log(mag)
     phase = np.exp(1.j * np.angle(D))
 
     return mag, phase
@@ -254,12 +253,9 @@ def normalize_Zscore(X_train, X_test):
 
     mu1=np.array([mu,]*X_train.shape[1]).T
     sigma1=np.array([sigma,]*X_train.shape[1]).T
- 
-    mu2=np.array([mu,]*X_test.shape[1]).T
-    sigma2=np.array([sigma,]*X_test.shape[1]).T
 
     X_train = (X_train - mu1) / sigma1
-    X_test = (X_test - mu2) / sigma2
+    X_test = (X_test - mu1) / sigma1
     return X_train, X_test
 
 def normalize_MinMax(X_train, X_test):
@@ -270,25 +266,10 @@ def normalize_MinMax(X_train, X_test):
 
     X_min1=np.array([X_min,]*X_train.shape[1]).T
     X_max1=np.array([X_max,]*X_train.shape[1]).T
- 
-    X_min2=np.array([X_min,]*X_test.shape[1]).T
-    X_max2=np.array([X_max,]*X_test.shape[1]).T
 
     X_train = (X_train - X_min1) / (X_max1-X_min1)
-    X_test = (X_test - X_min2) / (X_max2-X_min2) 
+    X_test = (X_test - X_min1) / (X_max1-X_min1) 
     return X_train, X_test
-
-# def normalize_Zscore(X):
-#     mu = np.mean(X, axis = 0)
-#     sigma = np.std(X, axis = 0)
-#     X = (X - mu) / sigma
-#     return X
-
-# def normalize_MinMax(X):
-#     X_min = np.min(X, axis = 0)
-#     X_max = np.max(X, axis = 0)
-#     X = (X - X_min) / (X_max-X_min)
-#     return X
 
 def nfft(frame_length):
     fft_size = 2
@@ -314,7 +295,7 @@ def apply_context_window(feats_mat, left_context, right_context):
 
 def perform_stft(path,args):
     (sr, time_signal) = wav.read(path)
-    time_signal=time_signal.astype('int16')
+    time_signal=time_signal.astype('float')
     fft_window = nfft(args.frame_length)
     freq_signal = librosa.stft(time_signal, n_fft=fft_window, win_length=args.frame_length, hop_length=args.hop_size, window=args.window)
     magnitude, phase = divide_magphase(freq_signal, power=1)
