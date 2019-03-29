@@ -14,15 +14,19 @@ import tensorflow as tf
 import os
 import librosa
 import argparse
-from utils.utils import * 
-from numpy.linalg import norm
+from utils.utils import *
 
+
+def makedirs(path):
+    if not os.path.exists(path):
+        print(" [*] Make directories : {}".format(path))
+        os.makedirs(path)
 
 def NMF(args):
-    PATH_MATLAB='"C:/Program Files/MATLAB/R2014a/bin/matlab.exe"'
-    PATH_ROOT = os.getcwd() 
-    PATH_MATLAB1 = os.path.join(PATH_ROOT , 'PESQ_MATLAB/execute_pesq.m')
-    
+    # PATH_MATLAB='"C:/Program Files/MATLAB/R2014a/bin/matlab.exe"'
+    PATH_ROOT = os.getcwd()
+    # PATH_MATLAB1 = os.path.join(PATH_ROOT , 'PESQ_MATLAB/execute_pesq.m')
+
     os.chdir(PATH_ROOT)
     path_clean_train        = os.path.join(PATH_ROOT , args.input_clean_train)
     path_clean_test         = os.path.join(PATH_ROOT , args.input_clean_test)
@@ -33,6 +37,8 @@ def NMF(args):
     path_noise_3            = os.path.join(PATH_ROOT , args.input_noise_3)
 
     output_path_estimated_noisy_test = os.path.join(PATH_ROOT , args.output_file)
+
+    makedirs(os.path.dirname(output_path_estimated_noisy_test))
     
     (sr, clean_train)     = wav.read(path_clean_train)
     (sr, clean_test)      = wav.read(path_clean_test)
@@ -42,11 +48,11 @@ def NMF(args):
     (sr, noise_2)         = wav.read(path_noise_2)
     (sr, noise_3)         = wav.read(path_noise_3)
 
-    clean_train             = clean_train.astype('int16')
-    noisy_test              = noisy_test.astype('int16')
-    noise_1                 = noise_1.astype('int16')
-    noise_2                 = noise_2.astype('int16')
-    noise_3                 = noise_3.astype('int16')
+    clean_train             = clean_train.astype('float')
+    noisy_test              = noisy_test.astype('float')
+    noise_1                 = noise_1.astype('float')
+    noise_2                 = noise_2.astype('float')
+    noise_3                 = noise_3.astype('float')
 
 
     # NMF training stage    
@@ -60,7 +66,7 @@ def NMF(args):
 
     # noise
     ##########################################################
-    # 1) 각 노이즈 마다 3000 frame 씩 이어붙혀서 총 9000으로 만들어서 40 base 로 만들기
+    # 1) make 40 bases with total 9000 frames ; 3000 frames for each noise
 
     # # three noises
     stft_noise_1 = librosa.stft(noise_1, n_fft=args.num_FFT, hop_length=args.hop_size, window=args.window)
@@ -77,7 +83,7 @@ def NMF(args):
     W_noise, H_noise              = NMF_MuR(nmf_magnitude_noise,args.r,args.max_iter,args.display_step,const_W=False,init_W=0)
 
 
-    # # # 2) base 13,13,14로 이어 붙히기
+    # 2) concat 13, 13, 14 bases for each noise
     # stft_noise_1 = librosa.stft(noise_1, n_fft=args.num_FFT, hop_length=args.hop_size, window=args.window)
     # stft_noise_2 = librosa.stft(noise_2, n_fft=args.num_FFT, hop_length=args.hop_size, window=args.window)
     # stft_noise_3 = librosa.stft(noise_3, n_fft=args.num_FFT, hop_length=args.hop_size, window=args.window)
@@ -118,9 +124,8 @@ def NMF(args):
     signal_reconstructed_clean =librosa.istft(stft_reconstructed_clean, hop_length=args.hop_size, window=args.window)
     signal_reconstructed_clean = signal_reconstructed_clean.astype('int16')
     wav.write(output_path_estimated_noisy_test,sr,signal_reconstructed_clean)
-    # Display signals, spectrograms
-    show_signal(clean_test,noisy_test,signal_reconstructed_clean,sr)
-    show_spectrogram(clean_test,noisy_test, signal_reconstructed_clean, sr, args.num_FFT,args.hop_size)
+
+
 
     # # =============================================================================
     # # PESQ
@@ -140,9 +145,6 @@ def NMF(args):
     #
     # # print('Noisy STOI: %.6f' % calc_stoi(clean_test / norm(clean_test), noisy_test / norm(noisy_test), sr))
     # # print('NMF STOI: %.6f' % calc_stoi(clean_test / norm(clean_test), signal_reconstructed_clean / norm(signal_reconstructed_clean), sr))
-    #
-
-
 
     
 def parse_args():
@@ -153,11 +155,12 @@ def parse_args():
     parser.add_argument('--input_clean_test',   type=str, default='datasets/timit_clean_selected/timit_clean_selected_test.wav')
     parser.add_argument('--input_noisy_test',   type=str, default='datasets/timit_noisy_selected/test_match/timit_noisy_babble_snr10_test.wav')
 
-    parser.add_argument('--input_noise_1', type=str, default='datasets/noise/NOISEX/babble.wav')
-    parser.add_argument('--input_noise_2', type=str, default='datasets/noise/NOISEX/factory1.wav')
-    parser.add_argument('--input_noise_3', type=str, default='datasets/noise/NOISEX/machinegun.wav')
+    parser.add_argument('--input_noise_1',      type=str, default='datasets/noise/NOISEX/babble.wav')
+    parser.add_argument('--input_noise_2',      type=str, default='datasets/noise/NOISEX/factory1.wav')
+    parser.add_argument('--input_noise_3',      type=str, default='datasets/noise/NOISEX/machinegun.wav')
     parser.add_argument('--output_file',        type=str, default='datasets/output/estimated_clean_NMF.wav')
 
+    parser.add_argument('--frame_length',       type=int, default='512', help='')
     parser.add_argument('--num_FFT',            type=int, default='512',    help='')
     parser.add_argument('--hop_size',           type=int, default='128',    help='')
     parser.add_argument('--window',             type=str, default='hamming',help='boxcar, triang, blackman, hamming, hann, bartlett, flattop, parzen, bohman, blackmanharris, nuttall, barthann, kaiser')
