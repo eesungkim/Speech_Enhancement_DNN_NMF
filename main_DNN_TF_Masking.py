@@ -24,8 +24,10 @@ from keras.layers.normalization import BatchNormalization
 from keras import initializers
 from keras.layers import LeakyReLU, PReLU, ELU
 
-
-
+def estimate_IRM(magnitude_clean,magnitude_noise):
+    denominator = np.abs(magnitude_clean) ** 2 + np.abs(magnitude_noise) ** 2
+    return (np.abs(magnitude_clean) ** 2 / denominator) ** (0.5)
+        
 def DNN_TF_Masking(args):
     """Speech Enhancement using DNN TF Masking"""
     PATH_ROOT = os.getcwd()
